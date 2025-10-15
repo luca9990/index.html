@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Sportiva</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f9; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h2 { border-bottom: 2px solid #ccc; padding-bottom: 10px; margin-top: 20px; color: #333; }
+       
+        .traffic-light-box {
+            padding: 10px;
+            border: 1px solid;
+            border-radius: 4px;
+            display: inline-block;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .rosso { background-color: #ffdddd; color: #cc0000; border-color: #cc0000; }
+        .giallo { background-color: #fffacd; color: #daa520; border-color: #daa520; }
+        .verde { background-color: #ddffdd; color: #008000; border-color: #008000; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #333; color: white; }
+
+        /* Stile per il form login */
+        #login-form {
+            margin-top: 10px;
+        }
+        #login-form input[type="text"] {
+            padding: 8px;
+            width: 200px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        #login-form button {
+            padding: 8px 12px;
+            font-size: 1em;
+            margin-left: 8px;
+            border: none;
+            background-color: #008000;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #login-form button:hover {
+            background-color: #006400;
+        }
+
+        /* Timer style */
+        #timer {
+            font-size: 1.2em;
+            margin-top: 8px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Dashboard Sportiva Completa</h1>
+
+    <h2>1) Stato Utente</h2>
+    <div id="login-status">
+        <form id="login-form" onsubmit="return false;">
+            <input type="text" id="username" placeholder="Inserisci il tuo nome utente" />
+            <button id="login-button">Accedi</button>
+        </form>
+    </div>
+
+    <div id="content-after-login" style="display:none;">
+        <h2>2) Semaforo Partita</h2>
+        <div id="traffic-light-status"></div>
+        <div id="timer"></div>
+
+        <h2>3) Classifica Squadre</h2>
+        <div id="team-ranking"></div>
+
+        <h2>4) Catalogo Merchandising</h2>
+        <div id="product-catalog"></div>
+    </div>
+</div>
+
+<script>
+    let isLoggedIn = false;
+    let currentUser     = "";
+
+    const loginStatusDiv = document.getElementById('login-status');
+    const loginForm = document.getElementById('login-form');
+    const usernameInput = document.getElementById('username');
+    const loginButton = document.getElementById('login-button');
+
+    function updateLoginStatus() {
+        const contentDiv = document.getElementById('content-after-login');
+        if (isLoggedIn) {
+            loginStatusDiv.innerHTML = `<p style="color: green;">✅ <strong>Benvenuto, ${currentUser    }!</strong> La tua sessione è attiva.</p>`;
+            contentDiv.style.display = 'block';  // Mostra contenuto
+        } else {
+            contentDiv.style.display = 'none';   // Nascondi contenuto
+            // Ricrea il form se non loggato
+            loginStatusDiv.innerHTML = `
+                <form id="login-form" onsubmit="return false;">
+                    <input type="text" id="username" placeholder="Inserisci il tuo nome utente" />
+                    <button id="login-button">Accedi</button>
+                </form>
+            `;
+            // Riassegna gli elementi e l'evento perché sono stati ricreati
+            const newLoginForm = document.getElementById('login-form');
+            const newUsernameInput = document.getElementById('username');
+            const newLoginButton = document.getElementById('login-button');
+
+            newLoginButton.addEventListener('click', () => {
+                const username = newUsernameInput.value.trim();
+                if (username.length > 0) {
+                    isLoggedIn = true;
+                    currentUser      = username;
+                    updateLoginStatus();
+                    startTrafficLightCycle();
+                } else {
+                    alert("Per favore, inserisci un nome utente.");
+                }
+            });
+        }
+    }
+
+    // Primo setup evento
+    loginButton.addEventListener('click', () => {
+        const username = usernameInput.value.trim();
+        if (username.length > 0) {
+            isLoggedIn = true;
+            currentUser     = username;
+            updateLoginStatus();
+            startTrafficLightCycle();
+        } else {
+            alert("Per favore, inserisci un nome utente.");
+        }
+    });
+
+    // Inizializza lo stato login
+    updateLoginStatus();
+
+    // --- Semaforo Partita con timer e ciclo ---
+    const trafficLightDiv = document.getElementById('traffic-light-status');
+    const timerDiv = document.getElementById('timer');
+
+    // Stati del semaforo in ordine di ciclo
+    const statiSemaforo = [
+        {
+            colore: 'verde',
+            message: "🟢 Partita in Corso. Goditi lo spettacolo!",
+            className: "verde",
+            timerLabel: "tempo rimanente partita "
+        },
+        {
+            colore: 'giallo',
+            message: "🟠 Pausa. Preparati alla ripresa.",
+            className: "giallo",
+            timerLabel: "tempo rimanente pausa "
+        },
+        {
+            colore: 'rosso',
+            message: "🔴 Stop! Partita Finita.",
+            className: "rosso",
+            timerLabel: "tempo alla partita "
+        }
+    ];
+
+    let statoIndex = 0;
+    let timeLeft = 10;
+    let timerInterval = null;
+
+    function mostraStatoSemaforo() {
+        const stato = statiSemaforo[statoIndex];
+        trafficLightDiv.innerHTML = `<div class="traffic-light-box ${stato.className}">${stato.message}</div>`;
+        timeLeft = 10;
+        updateTimer(stato.timerLabel);
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            if (timeLeft < 0) {
+                // Passa allo stato successivo
+                statoIndex = (statoIndex + 1) % statiSemaforo.length;
+                mostraStatoSemaforo();
+            } else {
+                updateTimer(stato.timerLabel);
+            }
+        }, 1000);
+    }
+
+    function updateTimer(label) {
+        timerDiv.textContent = `${label}: ${timeLeft} second${timeLeft !== 1 ? 'i' : ''}`;
+    }
+
+    // Avvia il ciclo solo se loggato
+    function startTrafficLightCycle() {
+        mostraStatoSemaforo();
+    }
+
+    // --- Classifica Squadre Preferite ---
+    const favoriteTeams = ["napoli", "roma", "lazio"];
+    const rankingDiv = document.getElementById('team-ranking');
+
+    let olContent = "<ol>";
+    favoriteTeams.forEach((team, index) => {
+        const trophy = index === 0 ? "🏆" : (index === 1 ? "🥈" : "🥉");
+        olContent += `<li>${trophy} ${team}</li>`;
+    });
+    olContent += "</ol>";
+
+    rankingDiv.innerHTML = olContent;
+
+    // --- Catalogo Merchandising ---
+    const prodotti = [
+        { id: 'M001', nome: "Maglia Ufficiale Casa", prezzo: 85.00 },
+        { id: 'S002', nome: "Sciarpa Team", prezzo: 19.99 },
+        { id: 'C003', nome: "Cappellino da Baseball", prezzo: 25.50 }
+    ];
+
+    const catalogDiv = document.getElementById('product-catalog');
+
+    let tableHTML = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Codice</th>
+                    <th>Nome Articolo</th>
+                    <th>Prezzo (€)</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    prodotti.forEach(prodotto => {
+        tableHTML += `
+            <tr>
+                <td>${prodotto.id}</td>
+                <td>${prodotto.nome}</td>
+                <td>${prodotto.prezzo.toFixed(2)}</td>
+            </tr>
+        `;
+    });
+
+    tableHTML += `
+            </tbody>
+        </table>
+    `;
+
+    catalogDiv.innerHTML = tableHTML;
+</script>
+
+</body>
+</html>
