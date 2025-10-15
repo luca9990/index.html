@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Esercizi Vue Combinati Aggiornati</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        #app {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        hr {
+            border: 0;
+            height: 1px;
+            background: #eee;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        input[type="number"], input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 5px;
+        }
+        .riepilogo-dati {
+            margin-top: 20px;
+            border: 1px solid #bdc3c7;
+            padding: 15px;
+            border-radius: 6px;
+            background-color: #ecf0f1;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+        <h1>Esercizi di Reattività Combinati</h1>
+
+        <section>
+            <h2>1. Cambia Messaggio</h2>
+            <p>{{ messaggio }}</p>
+            <button @click="cambiaTesto">Cambia Testo</button>
+        </section>
+
+        <hr>
+
+        <section>
+            <h2>2. Accendi/Spegni</h2>
+            <p>
+                La luce è: 
+                <span v-if="luceAccesa" style="color: #3498db; font-weight: bold; padding: 2px 5px; border-radius: 3px; background-color: #eaf2f8;">Accesa</span>
+                <span v-else style="color: #c0392b; font-weight: bold; padding: 2px 5px; border-radius: 3px; background-color: #fbecec;">Spenta</span>
+            </p>
+            <button @click="toggleLuce">pulsante luce</button>
+        </section>
+
+        <hr>
+
+        <section>
+            <h2>3. Convertitore di Unità (kg a g)</h2>
+            <div>
+                <label for="kgInput">Inserisci Chilogrammi (kg):</label>
+                <input id="kgInput" type="number" v-model.number="chilogrammi" min="0">
+            </div>
+            <p>Valore in Grammi (g): <strong>{{ chilogrammi * 1000 }} g</strong></p>
+        </section>
+
+        <hr>
+
+        <section>
+            <h2>4. Form di Registrazione Semplice</h2>
+            <form @submit.prevent>
+                <div>
+                    <label for="nome">Nome:</label>
+                    <input id="nome" type="text" v-model="nome">
+                </div>
+                <div style="margin-top: 10px;">
+                    Genere:
+                    <label><input type="radio" v-model="genere" value="Uomo"> Uomo</label>
+                    <label><input type="radio" v-model="genere" value="Donna"> Donna</label>
+                    <label><input type="radio" v-model="genere" value="Altro"> Altro</label>
+                </div>
+                <div style="margin-top: 10px;">
+                    Paese:
+                    <label><input type="radio" v-model="paese" value="Italia"> Italia</label>
+                    <label><input type="radio" v-model="paese" value="Germania"> Germania</label>
+                    <label><input type="radio" v-model="paese" value="Francia"> Francia</label>
+                </div>
+            </form>
+            
+            <div class="riepilogo-dati">
+                <h3>Riepilogo Dati</h3>
+                <p>Nome: <strong>{{ nome || 'In attesa...' }}</strong></p>
+                <p>Genere: <strong>{{ genere }}</strong></p>
+                <p>Paese: <strong>{{ paese }}</strong></p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // 2. Definizione del componente/app
+        const App = {
+            data() {
+                return {
+                    messaggio: "Clicca il bottone per cambiare il messaggio!",
+                    luceAccesa: true,
+                    chilogrammi: 0,
+                    nome: '',
+                    genere: 'Uomo',
+                    paese: 'Italia'
+                };
+            },
+            methods: {
+                cambiaTesto() {
+                    this.messaggio = "Hai cliccato il bottone!";
+                },
+                toggleLuce() {
+                    this.luceAccesa = !this.luceAccesa;
+                }
+            }
+        };
+
+        // 3. Montaggio dell'applicazione
+        Vue.createApp(App).mount('#app');
+    </script>
+</body>
+</html>
