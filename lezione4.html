@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applicazione Vue.js Semplice</title>
+    <!-- Caricamento di Vue 3 -->
+    <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>  
+    
+    <style>
+        /* Stili Ristretti */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #app {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        
+        /* Contenitori e Sezioni */
+        .section-box {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        /* Messaggi */
+        .msg {
+            font-weight: bold;
+            margin-top: -5px;
+        }
+        
+        .error {
+            color: #dc3545; /* Rosso */
+        }
+        
+        .success {
+            color: green;
+        }
+
+        .total {
+            padding-top: 10px;
+            border-top: 1px dashed #eee;
+            margin-top: 10px;
+            font-size: 1.1em;
+        }
+        
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Dashboard Interattiva Vue</h1>
+        
+        <!-- Sezione 1: Età (Computed) -->
+        <div class="section-box">
+            <h3>Verifica Età</h3>
+            <label for="eta">Età:</label>
+            <input type="number" v-model.number="eta" id="eta" min="0">
+            <p class="msg" :class="{ 'success': eta >= 18, 'error': eta < 18 }">
+                Stato: {{ messaggioEta }}
+            </p>
+        </div>
+
+        <!-- Sezione 2: Carrello (Computed) -->
+        <div class="section-box">
+            <h3>Carrello</h3>
+            <ul>
+                <li v-for="(item, index) in carrello" :key="index">
+                    {{ item.nome }} - Prezzo: {{ item.prezzo.toFixed(2) }} €
+                </li>
+            </ul>
+            <p class="msg total">Totale: {{ totaleCarrello.toFixed(2) }} €</p>
+        </div>
+
+        <!-- Sezione 3: Username (Watch) -->
+        <div class="section-box">
+            <h3>Validation Username</h3>
+            <label for="username">Username (min. 5 caratteri):</label>
+            <input type="text" v-model="username" id="username">
+            <p class="msg" :class="{ 'error': errorMessage, 'success': !errorMessage }">
+                {{ errorMessage || 'Username valido!' }}
+            </p>
+        </div>
+
+        <!-- Sezione 4: Textarea (Watch Semplificato) -->
+        <div class="section-box">
+            <h3>Salvataggio Automatico</h3>
+            <label for="textarea">Textarea:</label>
+            <textarea v-model="textareaContent" id="textarea" rows="3"></textarea>
+            <p class="msg">{{ saveMessage }}</p>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    // Dati: Variabili reattive
+                    eta: 20, 
+                    username: '', 
+                    textareaContent: '',
+                    carrello: [
+                        { nome: 'T-shirt', prezzo: 19.99 },
+                        { nome: 'Libro', prezzo: 12.50 },
+                        { nome: 'Mouse Pad', prezzo: 7.90 },
+                    ],
+
+                    // Messaggi di stato
+                    errorMessage: 'Inserisci un username di almeno 5 caratteri.',
+                    saveMessage: 'Inizia a digitare...',
+                    saveTimer: null,
+                };
+            },
+
+            computed: {
+                // Proprietà calcolate: Valori derivati
+                messaggioEta() {
+                    return this.eta >= 18 ? 'Maggiorenne' : 'Minorenne';
+                },
+
+                totaleCarrello() {
+                    return this.carrello.reduce((total, item) => total + item.prezzo, 0);
+                },
+            },
+
+            watch: {
+                // Watcher: Reazioni ai cambiamenti di dati specifici
+                username(newVal) {
+                    if (newVal.length < 5 && newVal.length > 0) {
+                        this.errorMessage = 'Troppo corto (min. 5 caratteri)';
+                    } else if (newVal.length === 0) {
+                        this.errorMessage = 'Inserisci un username di almeno 5 caratteri.';
+                    } else {
+                        this.errorMessage = '';  
+                    }
+                },
+
+                textareaContent() {
+                    // Watcher semplificato per il salvataggio automatico
+                    clearTimeout(this.saveTimer);
+                    this.saveMessage = 'Sto salvando...';  
+                    
+                    this.saveTimer = setTimeout(() => {
+                        this.saveMessage = 'Salvato!';  
+                    }, 800);
+                },
+            },
+            
+            mounted() {
+                // Inizializza il controllo al montaggio
+                this.username = this.username; 
+            }
+            
+        }).mount('#app');
+    </script>
+</body>
+</html>
