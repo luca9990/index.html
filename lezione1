@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Vue Dati Dinamici</title>
+    <!-- Caricamento di Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Caricamento di Tailwind CSS per uno styling semplice e moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Stili personalizzati per migliorare l'estetica, soprattutto per il pulsante disabilitato */
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-8 font-sans antialiased">
+
+    <!-- Contenitore principale dell'app Vue -->
+    <div id="app" v-cloak class="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl p-8 space-y-10">
+
+        <h1 class="text-3xl font-extrabold text-blue-800 border-b pb-4">Esercizi di Data Binding con Vue</h1>
+
+        <!-- 1) Profilo Utente -->
+        <section class="p-6 bg-blue-50 rounded-xl border border-blue-200">
+            <h2 class="text-2xl font-semibold text-blue-700 mb-4">1) Profilo Utente</h2>
+            <div class="space-y-2 text-gray-700">
+                <p><strong>Nome:</strong> <span class="font-medium text-blue-900">{{ nome }}</span></p>
+                <p><strong>Cognome:</strong> <span class="font-medium text-blue-900">{{ cognome }}</span></p>
+                <p><strong>Città:</strong> <span class="font-medium text-blue-900">{{ citta }}</span></p>
+            </div>
+        </section>
+
+        <!-- 2) Dettagli Prodotto -->
+        <section class="p-6 bg-green-50 rounded-xl border border-green-200">
+            <h2 class="text-2xl font-semibold text-green-700 mb-4">2) Dettagli Prodotto</h2>
+            <p class="text-lg text-gray-700">
+                Il prodotto **{{ nomeProdotto }}** costa <span class="text-xl font-bold text-green-800">{{ prezzoProdotto.toFixed(2) }} €</span>.
+            </p>
+        </section>
+
+        <!-- 3) Immagine Disattivata (Pulsante Condizionale) -->
+        <section class="p-6 bg-red-50 rounded-xl border border-red-200">
+            <h2 class="text-2xl font-semibold text-red-700 mb-4">3) Pulsante Condizionale (v-bind:disabled)</h2>
+
+            <!-- Toggle per cambiare lo stato della proprietà booleana -->
+            <div class="flex items-center space-x-4 mb-4">
+                <label for="toggle" class="text-gray-700">Immagine disabilitata ({{ immagineDisabilitata ? 'Vero' : 'Falso' }}):</label>
+                <input type="checkbox" id="toggle" v-model="immagineDisabilitata" class="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500">
+            </div>
+
+            <!-- Il pulsante è disabilitato solo se immagineDisabilitata è true -->
+            <button
+                :disabled="immagineDisabilitata"
+                class="px-6 py-3 rounded-lg font-bold transition duration-150 ease-in-out"
+                :class="{
+                    'bg-red-600 text-white hover:bg-red-700': !immagineDisabilitata,
+                    'bg-gray-300 text-gray-500 cursor-not-allowed': immagineDisabilitata
+                }"
+            >
+                Scarica Immagine
+            </button>
+            <p v-if="immagineDisabilitata" class="text-sm text-red-500 mt-2">Il pulsante è disabilitato (attributo `disabled` attivo).</p>
+            <p v-else class="text-sm text-green-500 mt-2">Il pulsante è abilitato (attributo `disabled` assente).</p>
+        </section>
+
+        <!-- 4) Tooltip Dinamico e Messaggio Condizionale -->
+        <section class="p-6 bg-yellow-50 rounded-xl border border-yellow-200">
+            <h2 class="text-2xl font-semibold text-yellow-700 mb-4">4) Tooltip Dinamico e Messaggio all'Hover</h2>
+            
+            <label for="tooltip-input" class="block text-gray-700 mb-2">Modifica il testo del Tooltip:</label>
+            <input type="text" id="tooltip-input" v-model="messaggioTooltip" class="w-full p-2 border border-yellow-300 rounded-lg mb-4 focus:ring-yellow-500 focus:border-yellow-500">
+
+            <!-- Contenitore che gestisce gli eventi mouseover e mouseleave -->
+            <div 
+                @mouseover="isHovering = true" 
+                @mouseleave="isHovering = false"
+                class="bg-yellow-100 p-4 rounded-lg border-l-4 border-yellow-500 font-medium text-gray-800 hover:shadow-md transition duration-150 ease-in-out cursor-pointer relative"
+            >
+                <!-- Messaggio principale visibile sempre -->
+                <p>Passa il mouse qui per vedere l'effetto.</p>
+                
+                <!-- Messaggio che appare solo quando isHovering è TRUE -->
+                <p v-if="isHovering" class="mt-2 text-yellow-700 font-bold p-2 bg-yellow-200 rounded">
+                    Passa il mouse su questo paragrafo per visualizzare il Tooltip dinamico!
+                </p>
+
+            </div>
+
+            <!-- Paragrafo originale con l'attributo 'title' legato (questo è il tooltip nativo del browser) -->
+            <p :title="messaggioTooltip" class="text-sm text-gray-500 mt-4">
+                
+            </p>
+        </section>
+
+    </div>
+
+    <script>
+        // Inizializzazione dell'applicazione Vue
+        const app = Vue.createApp({
+            // La funzione data() definisce lo stato reattivo dell'applicazione
+            data() {
+                return {
+                    // 1) Profilo Utente
+                    nome: 'Luca',
+                    cognome: 'Macrino',
+                    citta: 'Torino',
+
+                    // 2) Dettagli Prodotto
+                    nomeProdotto: 'iphone 17',
+                    prezzoProdotto: 979.00,
+
+                    // 3) Immagine Disabilitata (Valore booleano per l'attributo 'disabled')
+                    immagineDisabilitata: true, // Inizialmente true, quindi il pulsante è disabilitato
+
+                    // 4) Tooltip Dinamico
+                    messaggioTooltip: 'Questo è il testo del tooltip dinamico!',
+                    isHovering: false // Nuovo stato per tracciare il passaggio del mouse
+                }
+            }
+        });
+
+        // Montaggio dell'applicazione sull'elemento con id="app"
+        app.mount('#app');
+    </script>
+</body>
+</html>
