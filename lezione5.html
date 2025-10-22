@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esercizi Vue.js - Minimalista Corretto</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        /* CSS MINIMIZZATO E AGGIORNATO */
+        body { font-family: sans-serif; padding: 40px; background-color: #f4f7f6; color: #333; }
+        h2 { color: #1a4d2e; border-bottom: 2px solid #4caf50; padding-bottom: 5px; margin-top: 30px; }
+        .section-separator { margin: 40px 0; border: none; border-top: 3px solid #ddd; opacity: 0.5; }
+        
+        button {
+            background-color: #4caf50; color: white; border: none; padding: 10px 20px;
+            text-align: center; display: inline-block; font-size: 14px; margin: 4px 2px;
+            cursor: pointer; border-radius: 5px; transition: background-color 0.3s, transform 0.1s;
+        }
+        button:hover { background-color: #388e3c; }
+        button:active { transform: scale(0.98); }
+
+        /* 1. STATO MESSAGGIO */
+        #app-messaggio { padding: 20px; border: 1px solid #ccc; border-radius: 8px; background-color: #fff; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); }
+        .message-box { padding: 15px; margin-bottom: 15px; width: 300px; text-align: center; font-weight: bold; color: white; border-radius: 6px; transition: background-color 0.4s, box-shadow 0.4s; background-color: #9e9e9e; }
+        .success { background-color: #4CAF50; box-shadow: 0 0 10px rgba(76, 175, 80, 0.5); }
+        .error { background-color: #f44336; box-shadow: 0 0 10px rgba(244, 67, 54, 0.5); }
+
+        /* 2. AVATAR PERSONALIZZABILE */
+        #app-avatar { display: flex; gap: 40px; align-items: flex-start; padding: 20px; border-radius: 8px; background-color: #fff; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); }
+        .avatar-controls div { margin-bottom: 15px; }
+        .avatar-controls label { display: block; margin-bottom: 5px; font-weight: 600; }
+        .avatar-controls input { padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 150px; }
+        .avatar-controls input[type="color"] { height: 35px; padding: 2px; }
+        .avatar-preview {
+            margin: 20px 0;
+            border: 3px solid #000; /* Bordo nero solido */
+            display: block;
+            border-radius: 50%; 
+            transition: all 0.5s ease-out;
+            flex-shrink: 0;
+        }
+
+        /* 3 & 4. COMPONENTI */
+        .component-container { 
+             display: flex; flex-direction: column; gap: 20px; 
+             padding: 20px; border-radius: 8px; background-color: #fff; 
+             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); 
+        }
+
+        .saluto-div { border: 2px solid #ff9800; padding: 15px; background-color: #fff3e0; color: #e65100; font-size: 1.1em; border-radius: 6px; }
+        .card-container { 
+            padding: 20px; width: 300px; box-shadow: 0 6px 15px rgba(0,0,0,0.1); 
+            border-radius: 10px; background-color: #ffffff; transition: transform 0.3s;
+        }
+        .card-container:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+        .card-container h3 { margin-top: 0; color: #1a4d2e; font-size: 1.4em; border-bottom: 1px dotted #ccc; padding-bottom: 5px; }
+        .card-container p { font-size: 1em; color: #555; }
+    </style>
+</head>
+<body>
+
+    <h2>1. Stato del messaggio</h2>
+    <div id="app-messaggio">
+        <div :class="messageClass" class="message-box">
+            Stato: {{ messageClass ? messageClass.toUpperCase() : 'NEUTRO' }}
+        </div>
+        <button @click="setStatus('success')">Imposta come Successo</button>
+        <button @click="setStatus('error')">Imposta come Errore</button>
+    </div>
+
+    <hr class="section-separator">
+
+    <h2>2. Avatar personalizzabile</h2>
+    <div id="app-avatar">
+        
+        <div class="avatar-controls">
+            <div>
+                <label>Larghezza (px):</label>
+                <input type="number" v-model.number="width" min="30" max="200">
+            </div>
+            
+            <div>
+                <label>Altezza (px):</label>
+                <input type="number" v-model.number="height" min="30" max="200">
+            </div>
+            
+            <div>
+                <label>Colore:</label>
+                <input type="color" v-model="backgroundColor">
+            </div>
+        </div>
+
+        <div 
+            :style="avatarStyle" 
+            class="avatar-preview">
+        </div>
+    </div>
+
+    <hr class="section-separator">
+
+    <!-- CONTENITORE UNIFICATO PER I COMPONENTI 3 E 4 -->
+    <div id="app-componenti_generico"> 
+
+        <h2>3. Saluto personale</h2>
+        <div class="component-container">
+            <saluto-utente></saluto-utente>
+            <saluto-utente></saluto-utente>
+        </div>
+
+        <hr class="section-separator">
+
+        <h2>4. Card semplice</h2>
+        <div class="component-container">
+            <info-card></info-card>
+        </div>
+
+    </div>
+
+
+    <script>
+        const { createApp, ref, computed } = Vue;
+
+        // --- 1. ESERCIZIO: STATO DEL MESSAGGIO ---
+        createApp({
+            setup() {
+                const messageClass = ref('');
+                const setStatus = (status) => { messageClass.value = status; };
+                return { messageClass, setStatus };
+            }
+        }).mount('#app-messaggio');
+
+
+        // --- 2. ESERCIZIO: AVATAR PERSONALIZZABILE ---
+        createApp({
+            setup() {
+                const width = ref(50);
+                const height = ref(50);
+                const backgroundColor = ref('#ffffff'); // Colore iniziale bianco
+                
+                const avatarStyle = computed(() => ({
+                    width: `${width.value}px`,
+                    height: `${height.value}px`,
+                    backgroundColor: backgroundColor.value,
+                    borderRadius: '50%' 
+                }));
+                return { width, height, backgroundColor, avatarStyle };
+            }
+        }).mount('#app-avatar');
+
+
+        // --- 3 & 4. ESERCIZIO: COMPONENTI ---
+
+        // Componente 1: Saluto Personale
+        const SalutoUtente = {
+            template: `<div class="saluto-div"><p>Benvenuto nella nostra applicazione Luca!</p></div>`
+        };
+
+        // Componente 2: Card Semplice
+        const InfoCard = {
+            template: `
+                <div class="card-container">
+                    <h3>Titolo della Card</h3>
+                    <p>Contenuto della card statico, definito direttamente nel template del componente.</p>
+                </div>
+            `
+        };
+        
+        // Montiamo l'unica istanza dell'app Vue sul contenitore generico.
+        createApp({})
+            .component('saluto-utente', SalutoUtente)
+            .component('info-card', InfoCard)
+            .mount('#app-componenti_generico'); 
+    </script>
+
+</body>
+</html>
