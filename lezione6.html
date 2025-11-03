@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Esercizi Componenti Vue.js </title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        /* Stili CSS di tutti i componenti e globali */
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        #app {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        hr {
+            margin: 30px 0;
+            border: 0;
+            border-top: 1px solid #eee;
+        }
+        h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #42b983;
+            padding-bottom: 5px;
+        }
+
+        /* Stili Componente 1: Product Card (Invariati) */
+        .prodotti-container { display: flex; flex-wrap: wrap; gap: 20px; }
+        .product-card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; width: 200px; box-shadow: 1px 1px 3px rgba(0,0,0,0.05); background-color: #fff; }
+        .product-card h3 { margin-top: 0; color: #42b983; font-size: 1.2em; }
+
+        /* Stili Componente 2: Alert Box (Invariati) */
+        .alert-box { padding: 10px 20px; margin: 15px 0; border-radius: 4px; border: 1px solid transparent; }
+        .alert-box.success { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
+        .alert-box.error { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+        .alert-box p { margin: 0; }
+
+        /* Stili Componente 3: Modal Dialog (Invariati) */
+        .modal-backdrop { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 30px; border-radius: 10px; min-width: 300px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); }
+        .close-btn { margin-top: 15px; padding: 8px 15px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; }
+        .close-btn:hover { background-color: #c82333; }
+
+        /* Stili Componente 4: Star Rating (Modificati) */
+        .star-rating { display: inline-block; margin-top: 10px; }
+        .star-button {
+            background: none;
+            border: none;
+            font-size: 30px;
+            cursor: pointer;
+            margin: 0 2px;
+            padding: 0;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+        /* Stili per le stelle PIENE (Gialle) e VUOTE (Grigie) */
+        .star-button.filled {
+            color: gold;
+        }
+        .star-button.empty {
+            color: #ccc; /* Grigio chiaro per le stelle vuote */
+        }
+        .star-button:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+        <h1>Esercizi Componenti Vue.js</h1>
+
+        <section>
+            <h2>1. Card Prodotto</h2>
+            <div class="prodotti-container">
+                <product-card v-for="prodotto in listaProdotti" :key="prodotto.id" :nome-prodotto="prodotto.nome" :prezzo="prodotto.prezzo"></product-card>
+            </div>
+        </section>
+        
+        <hr>
+
+        <section>
+            <h2>2. Alert Box</h2>
+            <alert-box messaggio="Operazione completata con successo!" tipo="success"></alert-box>
+            <alert-box messaggio="Attenzione! Si è verificato un errore durante il salvataggio." tipo="error"></alert-box>
+        </section>
+
+        <hr>
+
+        <section>
+            <h2>3. Chiudi Modale</h2>
+            <button @click="modaleAperta = true">Apri Modale</button>
+            <p v-if="modaleAperta">La modale è APERTA.</p>
+            <p v-else>La modale è CHIUSA.</p>
+            <modal-dialog v-if="modaleAperta" @chiudi="chiudiModale"></modal-dialog>
+        </section>
+
+        <hr>
+
+        <section>
+            <h2>4. Valutazione a Stelle</h2>
+            <p>Valutazione selezionata: {{ valutazioneRicevuta }} </p>
+
+            <star-rating 
+                :voto-attuale="valutazioneRicevuta" 
+                @imposta-valutazione="impostaValutazione"
+            ></star-rating>
+        </section>
+    </div>
+
+    <script>
+        const { createApp, ref } = Vue;
+
+        // ----------------------------------------------------------------
+        // --- DEFINIZIONE DEI COMPONENTI
+        // ----------------------------------------------------------------
+
+        // Componenti 1, 2, 3 (Invariati)
+        const ProductCard = { props: { nomeProdotto: String, prezzo: Number }, template: `<div class="product-card"><h3>{{ nomeProdotto }}</h3><p>Prezzo: \€{{ prezzo.toFixed(2) }}</p></div>` };
+        const AlertBox = { props: { messaggio: String, tipo: String }, template: `<div class="alert-box" :class="tipo"><p><strong>{{ tipo.toUpperCase() }}</strong>: {{ messaggio }}</p></div>` };
+        const ModalDialog = { emits: ['chiudi'], template: `<div class="modal-backdrop" @click.self="$emit('chiudi')"><div class="modal-content"><h4>Modal Dialog</h4><p>Contenuto della modale.</p><button @click="$emit('chiudi')" class="close-btn">Chiudi</button></div></div>` };
+
+
+        // 4. Valutazione a Stelle - MODIFICATO
+        const StarRating = {
+            emits: ['imposta-valutazione'],
+            props: {
+                // Nuova prop per ricevere il voto attuale dal genitore
+                votoAttuale: {
+                    type: Number,
+                    default: 0
+                }
+            },
+            template: `
+                <div class="star-rating">
+                    <button 
+                        v-for="i in 5" 
+                        :key="i" 
+                        class="star-button"
+                        
+                        :class="{ 'filled': i <= votoAttuale, 'empty': i > votoAttuale }"
+                        
+                        @click="$emit('imposta-valutazione', i)"
+                    >
+                        ★
+                    </button>
+                </div>
+            `
+        };
+
+
+        // ----------------------------------------------------------------
+        // --- ISTANZA PRINCIPALE DI VUE (Componente Genitore)
+        // ----------------------------------------------------------------
+
+        const App = {
+            components: {
+                'product-card': ProductCard,
+                'alert-box': AlertBox,
+                'modal-dialog': ModalDialog,
+                'star-rating': StarRating
+            },
+            data() {
+                return {
+                    listaProdotti: [
+                        { id: 1, nome: 'Laptop Ultraleggero', prezzo: 1299.99 },
+                        { id: 2, nome: 'Mouse Wireless', prezzo: 25.50 },
+                        { id: 3, nome: 'Monitor 4K', prezzo: 450.00 }
+                    ],
+                    modaleAperta: false,
+                    // Il valore che controlla lo stato visivo e logico delle stelle
+                    valutazioneRicevuta: 0 
+                };
+            },
+            methods: {
+                chiudiModale() {
+                    this.modaleAperta = false;
+                },
+                impostaValutazione(valutazione) {
+                    // Aggiorna lo stato nel genitore, che a sua volta aggiorna la prop nel figlio
+                    this.valutazioneRicevuta = valutazione;
+                }
+            }
+        };
+
+        // Montaggio dell'applicazione
+        createApp(App).mount('#app');
+    </script>
+
+</body>
+</html>
