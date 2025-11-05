@@ -1,142 +1,176 @@
-<!DOCTYPE html> 
-<html lang="it"> 
+<!DOCTYPE html>
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>I Miei Codici su GitHub</title>
+    <title>I Miei Codici su GitHub - Dark Orange Glow</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* CSS Integrato per la Struttura e lo Stile */
+        /* Variabili Aggiornate per il tema Nero e Arancione */
         :root {
-            --colore-primario: #007bff;
-            --colore-sfondo: #ffffff;
-            --colore-card-sfondo: #f9f9f9;
-            --colore-testo: #333;
-            --colore-bordo: #ddd;
+            --colore-primario: #FF8C00; /* Arancione Intenso */
+            --colore-primario-scuro: #CC7000; /* Arancione più scuro per l'hover del bottone */
+            --colore-sfondo: #121212; /* Sfondo molto scuro, quasi nero */
+            --colore-card-sfondo: #1e1e1e; /* Card nere/grigio scuro */
+            --colore-testo: #e0e0e0; /* Testo chiaro */
+            --colore-testo-secondario: #b0b0b0; /* Grigio chiaro per i dettagli */
+            --colore-bordo: #333333; /* Bordo grigio scuro */
+            --shadow-leggera: 0 4px 15px rgba(0, 0, 0, 0.4); 
+            
+            /* Variabili per l'effetto Glow */
+            --glow-color: #FF8C00;
+            --glow-shadow: 0 0 10px var(--glow-color), 0 0 20px var(--glow-color), 0 0 30px rgba(255, 140, 0, 0.4);
         }
 
-        /* STRUTTURA GENERALE (Sfondo Bianco) */
+        /* STRUTTURA GENERALE */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Poppins', sans-serif; 
             background-color: var(--colore-sfondo);
             color: var(--colore-testo);
             margin: 0;
             padding: 0;
             line-height: 1.6;
-            
-            /* Necessario per una pagina pulita, ma senza forzare l'altezza se non c'è footer */
             min-height: 100vh;
         }
 
+        /* HEADER */
         header {
-            background-color: var(--colore-primario);
-            color: white;
-            padding: 30px 20px;
+            background-color: var(--colore-card-sfondo); 
+            color: var(--colore-testo); 
+            padding: 40px 20px 20px; 
             text-align: center;
+            border-bottom: 1px solid var(--colore-bordo); 
         }
 
         header h1 {
             margin-bottom: 5px;
-            font-size: 2.5em;
+            font-size: 3em; 
+            font-weight: 700; 
+            color: var(--colore-primario); /* Titolo Arancione */
+            text-shadow: 0 0 5px rgba(255, 140, 0, 0.5); /* Leggero glow sul titolo */
+        }
+        
+        /* Aggiungo un sottotitolo opzionale per l'header per migliorare il look */
+        header p {
+            color: var(--colore-testo-secondario);
+            font-size: 1.1em;
+            margin-top: 5px;
         }
 
-        /* Contenitore principale (main) */
+
+        /* CONTENITORE CARD */
         .card-container {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 20px;
-            padding: 20px 10px;
-            
-            /* Permette l'uniformità delle card */
+            gap: 30px; 
+            padding: 50px 20px;
             align-items: stretch;
         }
 
-        /* Stile delle Singole Card (LARGHEZZA, ALTEZZA e UNIFORMITÀ) */
+        /* STILE DELLE CARD */
         .card {
             background-color: var(--colore-card-sfondo);
             border: 1px solid var(--colore-bordo);
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 50px;
-            width: 300px;
-            
-            /* Internamente usa Flexbox */
+            border-radius: 12px; 
+            box-shadow: var(--shadow-leggera);
+            padding: 30px; 
+            width: 320px; 
             display: flex;
             flex-direction: column; 
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.4s;
         }
 
+        /* EFFETTO GLOW ALL'HOVER: Bordo Arancione e Ombra luminosa */
         .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-10px); 
+            border-color: var(--colore-primario); /* Contorno Arancione */
+            box-shadow: var(--glow-shadow); /* Ombra Glow Arancione */
         }
 
         .card h2 {
-            color: var(--colore-primario);
+            color: var(--colore-primario); /* Titoli Card Arancioni */
             margin-top: 0;
-            font-size: 1.5em;
+            font-size: 1.6em;
+            font-weight: 600; 
+            margin-bottom: 10px;
         }
         
         .card p {
-            /* Spinge il bottone in fondo */
-            flex-grow: 1; 
-            margin-bottom: 20px;
-            color: #555;
+            flex-grow: 1;
+            margin-bottom: 25px;
+            color: var(--colore-testo-secondario); 
+            font-size: 0.95em;
         }
 
-        /* Stile del Bottone (Link) */
+        /* STILE DEL BOTTONE */
         .button {
             display: block;
-            background-color: var(--colore-primario);
-            color: white;
-            padding: 12px 20px;
+            background-color: var(--colore-primario); /* Bottone Arancione */
+            color: var(--colore-card-sfondo); /* Testo bottone Nero/Grigio scuro */
+            padding: 14px 25px; 
             text-align: center;
             text-decoration: none;
-            border-radius: 6px;
-            transition: background-color 0.2s;
-            font-weight: bold;
-            margin-top: auto; /* SPINGE IL BOTTONE IN FONDO ALLA CARD */
+            border-radius: 8px;
+            transition: background-color 0.3s, transform 0.1s;
+            font-weight: 600;
+            margin-top: auto; 
             border: none;
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            letter-spacing: 0.5px; 
         }
 
         .button:hover {
-            background-color: #0056b3;
+            background-color: var(--colore-primario-scuro);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.7);
         }
         
         .button:active {
-            background-color: #004085;
+            background-color: #A35D00;
+            transform: translateY(0);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
         }
 
-        /* Stile per un bottone 'In Sviluppo' */
+        /* Stile per un bottone 'In Sviluppo' (Grigio Scuro) */
         .button.disabled {
-            background-color: #ccc;
-            cursor: default;
+            background-color: var(--colore-bordo);
+            color: var(--colore-testo-secondario);
+            cursor: not-allowed;
             pointer-events: none;
             box-shadow: none;
+            transform: none;
         }
 
-        /* Footer rimosso */
-
         /* Media Query per layout responsivo */
-        @media (max-width: 900px) { 
+        @media (max-width: 768px) { 
+            header h1 {
+                font-size: 2.5em;
+            }
             .card {
-                width: 90%;
+                width: 95%; 
+                padding: 25px;
+            }
+            .card-container {
+                gap: 20px;
+                padding: 30px 15px;
             }
         }
     </style>
 </head>
+
 <body>
 
     <header>
-        <h1> I Miei Progetti </h1>
+        <h1>  I Miei Progetti </h1>
     </header>
 
     <main class="card-container">
 
-        <div class="card" id="card-java">
+        <div class="card" id="card-lezione1">
             <h2>Esercizio lezione 1</h2>
             <p>App Vue Dati Dinamici</p>
             <button class="button" data-link="https://luca9990.github.io/index.html/lezione1.html" data-nome="Java Base">
@@ -144,7 +178,7 @@
             </button>
         </div>
 
-        <div class="card" id="card-web">
+        <div class="card" id="card-lezione2">
             <h2>Esercizio lezione 2</h2>
             <p>Dashboard Sportiva </p>
             <button class="button" data-link="https://luca9990.github.io/index.html/lezione2.html" data-nome="Sito Web">
@@ -152,13 +186,13 @@
             </button>
         </div>
 
-        <div class="card" id="card-python">
+        <div class="card" id="card-lezione3">
             <h2>Esercizio lezione 3</h2>
             <p>Esercizi di Reattività Combinati</p>
             <button class="button" data-link="https://luca9990.github.io/index.html/lezione3.html" data-nome="Python Script">
                 Vai al Codice
             </button>
-        </div>    
+        </div>
         
         <div class="card" id="card-lezione4">
             <h2>Esercizio lezione 4</h2>
@@ -184,39 +218,39 @@
             </button>
         </div>
         
-        <div class="card" id="card-progetto-finale">
+        <div class="card" id="card-lezione7">
             <h2>Esercizio lezione 7</h2>
             <p>spiegazione esercizio</p>
-            <button class="button" data-link="https://luca9990.github.io/index.html/progetto-finale.html" data-nome="Progetto Finale">
-                Vai al Codice
-            </button>
-        </div>
-        
-        <div class="card" id="card-lezione7">
-            <h2>Esercizio lezione 8</h2>
-            <p>spiegazione esercizio</p>
-            <button class="button" data-link="https://luca9990.github.io/index.html/lezione7.html" data-nome="Lezione 7">
+            <button class="button" data-link="https://luca9990.github.io/index.html/lezione7.html" data-nome="Progetto Finale">
                 Vai al Codice
             </button>
         </div>
         
         <div class="card" id="card-lezione8">
-            <h2>Esercizio lezione 9</h2>
+            <h2>Esercizio lezione 8</h2>
             <p>spiegazione esercizio</p>
-            <button class="button" data-link="https://luca9990.github.io/index.html/lezione8.html" data-nome="Lezione 8">
+            <button class="button" data-link="https://luca9990.github.io/index.html/lezione8.html" data-nome="Lezione 7">
                 Vai al Codice
             </button>
         </div>
         
         <div class="card" id="card-lezione9">
-            <h2>Esercizio lezione 10</h2>
+            <h2>Esercizio lezione 9</h2>
             <p>spiegazione esercizio</p>
-            <button class="button" data-link="https://luca9990.github.io/index.html/lezione9.html" data-nome="Lezione 9">
+            <button class="button" data-link="https://luca9990.github.io/index.html/lezione9.html" data-nome="Lezione 8">
                 Vai al Codice
             </button>
         </div>
         
-        <div class="card" id="card-bootstrap">
+        <div class="card" id="card-lezione10">
+            <h2>Esercizio lezione 10</h2>
+            <p>spiegazione esercizio</p>
+            <button class="button" data-link="https://luca9990.github.io/index.html/lezione10.html" data-nome="Lezione 9">
+                Vai al Codice
+            </button>
+        </div>
+        
+        <div class="card" id="card-lezione11">
             <h2>Esercizio lezione 11</h2>
             <p>spiegazione esercizio</p>
             <button class="button" data-link="https://luca9990.github.io/index.html/bootstrap-layout.html" data-nome="Layout Responsive">
@@ -224,7 +258,7 @@
             </button>
         </div>
 
-        <div class="card" id="card-futuro">
+        <div class="card" id="card-lezione12">
             <h2>Progetto Futuro</h2>
             <p>Il mio prossimo progetto 🚧</p>
             <button class="button disabled" disabled>
@@ -233,10 +267,9 @@
         </div>
 
     </main>
-
     
     <script>
-        // JavaScript per gestire il click sui bottoni e i reindirizzamenti
+        // JavaScript per gestire il click sui bottoni e i reindirizzamenti (lasciato invariato)
         const buttons = document.querySelectorAll('.button[data-link]');
 
         buttons.forEach(button => {
@@ -246,7 +279,6 @@
             });
         });
         
-        // Ricorda di sostituire "luca9990" nei link con il tuo username GitHub!
     </script>
     
 </body>
